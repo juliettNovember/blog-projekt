@@ -3,8 +3,8 @@ from blog import app
 from blog.models import Entry, db
 from blog.forms import EntryForm
 
-def entry(entry_id=None):
-    if entry_id:
+def process_entry(entry_id=None):
+    if entry_id==None:
         form = EntryForm()
         errors = None
         if request.method == 'POST':
@@ -33,14 +33,11 @@ def entry(entry_id=None):
 
 @app.route("/")
 def index():
-   all_posts = Entry.query.filter_by(is_published=True).order_by(Entry.pub_date.desc())
-   return render_template("homepage.html", all_posts = all_posts)
+    all_posts = Entry.query.filter_by(is_published=True).order_by(Entry.pub_date.desc())
+    return render_template("homepage.html", all_posts = all_posts)
 
+@app.route("/post", defaults={"entry_id": None}, methods=["GET", "POST"])
 
-@app.route("/new-post/", methods=["GET", "POST"])
-def create_entry():
-    return entry()
-
-@app.route("/edit-post/<int:entry_id>", methods=["GET", "POST"])
+@app.route("/post/<int:entry_id>", methods=["GET", "POST"])
 def edit_entry(entry_id):
-    return entry(entry_id)
+    return process_entry(entry_id)
